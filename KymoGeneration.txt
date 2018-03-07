@@ -41,5 +41,9 @@ Analyse kymographs for binding events (number and time).
 
 
 
+Igor Pro 
 
+1. Open an experiment and load the ParsingSMKymoData.ipf
+2. From the 'LoadKymoAnalysisResults' menu run the required analysis, each time selecting the relevant folders created in step 11 above.
+3. This will create a number of data waves (most usefull are EndBindTime, LatBindTime, SummaryEndEvents, SummaryLatEvents and SummaryLength).
 
