@@ -1,0 +1,45 @@
+Generate kymographs for diffusion (or otherwise).
+
+(C) Chris Gell 2017
+
+1. Load a microtubule and stream. Check to see if you liek the look of it then proceed....
+2. On the MT image draw line ROIs over each tube, add these to the ROI manager each time (press T) - ensure that the ROIs extend at least 10 pixels off the ends of the MT.
+3. Load KymosFromSnapsAndStreamsCGv1.ijm and Run it
+4. Enter whne promted a short identifier - generall date, protein, conc.
+5. When promted identify the MT image, then the stream image.
+6. Choose a directory for the results to be saved.
+7. Choose wether to save PNGs of all images - generally not necessary, useful if you want to print out examples for a lab book though
+
+
+In the directory you chose you iwll fing a zip file with the ROIs of the microtubules analysed, the kymographs and a microtubule 'map' of the whole FOV.
+
+The kymogrpahs show which images they came from in the file names so everything should be traceable. I suggest analysis all similar experiments (conc, protein) placing all the data in a single folder. 
+
+When complete proceed to the AutoKymoAnalysis.ijm macro.
+
+
+
+
+Analyse kymographs for binding events (number and time).
+
+(C) Chris Gell 2017
+
+
+1. Load a kymograph, open the ROI mamanger and go to More>>Options and tick, 'Use ROI names as labels'.
+2. Load and run AutoKymoAnalysis.ijm
+3. Choose the kymo
+4. When promted modify the ROI to include only background. CLick OK
+5. Drag over the next ROI and put it on the left end (with the rectangle ROI tool, click-drag the number) click ok.
+6. Repeat for the other end and the lattice when promted.
+7. When promted choose a directory to save the results in.
+8. I suggest chreating a folder called kymo analysis inside the folder containing the kymos.
+9. RUn through the analysis and delete the ROIs that are not correct.
+10.THe analsysi generates 4 test files. One each with the binding times for the events on the lattice and either end and one with a summary in, total number of end and lattice events and microtubule length.
+11. After you have analysed all the kymographs place the results files for both ends and the lattice in individual folders.
+12. CLose all open windows.
+
+
+
+
+
+
