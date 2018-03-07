@@ -34,8 +34,8 @@ Analyse kymographs for binding events (number and time).
 7. When promted choose a directory to save the results in.
 8. I suggest chreating a folder called kymo analysis inside the folder containing the kymos.
 9. RUn through the analysis and delete the ROIs that are not correct.Add in any new ones you wish. These must be added as rectanguler ROIS. Only the height is important.
-10.THe analsysi generates 4 test files. One each with the binding times for the events on the lattice and either end and one with a summary in, total number of end and lattice events and microtubule length.
-11. After you have analysed all the kymographs place the results files for both ends and the lattice in individual folders.
+10.The analsysi generates 4 text files. One each with the binding times for the events on the lattice and either end, and one with a summary info, such as the total number of end and lattice events and microtubule length.
+11. After you have analysed all the kymographs group all of the results across the kymos into 3 folders (one each for ends, lattice and summary info).
 12. CLose all open windows.
 
 
