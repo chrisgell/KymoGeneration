@@ -156,11 +156,7 @@ roiManager("Show All");
 
 
 
-//close orignals
-selectWindow(mtImageName);
-close(mtImageName);
-selectWindow(gfpImageName);
-close(gfpImageName);
+
 
 //save everything
 dir = getDirectory("Choose a Directory");
@@ -169,6 +165,16 @@ dir = getDirectory("Choose a Directory");
 //newDir=dir + "/"+expName+"/";
 newDir=dir;
 
+ roiManager("deselect"); 
+ roiManager("save", newDir +expName+" "+gfpImageName+".zip")
+ roiManager("Show None"); 
+
+
+//close orignals
+selectWindow(mtImageName);
+close(mtImageName);
+selectWindow(gfpImageName);
+close(gfpImageName);
 
 
 ids=newArray(nImages); 
@@ -181,8 +187,9 @@ for (i=0;i<nImages;i++) {
         saveAs("tiff", newDir + expName + title + " " + "MT-" + mtImageName+ "Stream-"+gfpImageName); 
 }
 
- roiManager("deselect"); 
- roiManager("save", newDir +expName+" "+gfpImageName+".zip") 
+
+
+
 
  //ask user if wants kymo and mt 'map' saving as png.
 //getBoolean("Save PNGs of everything?");
@@ -200,7 +207,6 @@ for (i=0;i<nImages;i++) {
         saveAs("png", newDir+expName+title); 
 }
 } 
-
 
 
 
