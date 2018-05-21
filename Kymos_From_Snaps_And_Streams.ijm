@@ -1,6 +1,6 @@
 //Macro to generate Kymos from MT snaps and GFP streams.
-//Chris Gell 28-11-2017
-//Version 1
+//Chris Gell 21-05-2018
+//Version 2
 
 //macro to make kymos for gfp tirf data
 //assumes 2 images are loaded and that 
@@ -15,10 +15,19 @@
 
 
 // to add 
-// have it work out which is the stream
+// DONE- have it work out which is the stream
 // reduce thickness or transparency of the lines in the mt map
-//name directory in an intelegent way - not wanted, not flexible.
-//cope with multiple streams (of the same MT FOV)?
+//DONE - name directory in an intelegent way - not wanted, not flexible.
+//DONE, not wanted - cope with multiple streams (of the same MT FOV)?
+
+
+
+
+//environment variables
+envMakeFullOverlay=0;
+envAskForPNGs=0;
+
+
 
 
 
@@ -35,7 +44,6 @@ if (nImages!=2) {
 
 roiManager("show all with labels")
 
-setBatchMode(true); 
 
 //ask for an identifier for this analysis
 expName=getString("Enter an indetifier for this experiment", "");
@@ -43,61 +51,42 @@ expName=getString("Enter an indetifier for this experiment", "");
 
 
 
- //create an array with a list of open window names
+ //create an array with a list of open window names and then work out which image is which.
  n = nImages; 
     list = newArray(n); 
-    setBatchMode(true); 
     for (i=1; i<=n; i++) { 
         selectImage(i); 
         list[i-1] = getTitle; 
     } 
-    //setBatchMode(false); 
 
-// create a dialog to get the user to tell us which is which
-title = "Choose MT image";
-width=1024; height=1024;
-Dialog.create("Choose MT image");
-Dialog.addChoice("Type:", list);
-Dialog.show();
-mtImageName = Dialog.getChoice();
+selectWindow(list[0]);
+getDimensions(width, height, channels, slices, frames);
+if (slices==1) {
+	gfpImageName=list[0];
+	mtImageName=list[1];
+}
 
-
-
-
-// create a dialog to get the user to tell us which is which
-title = "Choose GFP image";
-width=1024; height=1024;
-Dialog.create("Choose GFP image");
-Dialog.addChoice("Type:", list);
-Dialog.show();
-
-gfpImageName = Dialog.getChoice();
-
-//print(gfpImageName);
+if (slices>=1) {
+	gfpImageName=list[1];
+	mtImageName=list[0];
+}
 
 
-
-//make the stack for the MT kymo
-// "ConvertImageToStack"
-//
-// This macro expands a single image into a
-// stack by duplicating the image a specified  
-// number of times.
 
 //get the number of frames in the stream
 selectWindow(gfpImageName);
 getDimensions(width, height, channels, slices, frames);
+ gfpImageID=getImageID();
 
   n = frames;
-  //print(n);
 
+
+//make the MT image the same length
  selectWindow(mtImageName);
+ mtImageID=getImageID();
  //make a blurred mt image, a little better look for the kymos
  run("Gaussian Blur...", "sigma=1");
- 
-
- 
-  
+   
   run("Copy");
   for (i=0; i<n-1; i++) {
       run("Add Slice");
@@ -105,11 +94,24 @@ getDimensions(width, height, channels, slices, frames);
   }
 
 
+//if wanted make a full overlay
 
 
+if (envMakeFullOverlay==1) {
+setSlice(1);
+run("Select None");
+//create mt id tools
+run("Merge Channels...", "c2=["+gfpImageName+"] c6=["+mtImageName+"] create keep");
+run("Z Project...", "projection=[Average Intensity]");
+run("Red");
+run("Enhance Contrast", "saturated=0.35");
+}
+
+//the user needs to add the ROI
+waitForUser("Please make sure you have selected ROI's as required.");
 
 
-
+//loop throught the ROI manager to create each of the kymos
 n = roiManager("count");
   for (i=0; i<n; i++) {
       
@@ -154,10 +156,6 @@ run("Grays");
 run("Enhance Contrast", "saturated=0.35");
 roiManager("Show All");
 
-
-
-
-
 //save everything
 dir = getDirectory("Choose a Directory");
 //dirTemp = getDirectory("Choose a Directory");
@@ -189,7 +187,7 @@ for (i=0;i<nImages;i++) {
 
 
 
-
+if (envAskForPNGs==1) {
 
  //ask user if wants kymo and mt 'map' saving as png.
 //getBoolean("Save PNGs of everything?");
@@ -207,10 +205,8 @@ for (i=0;i<nImages;i++) {
         saveAs("png", newDir+expName+title); 
 }
 } 
+}
 
-
-
-setBatchMode(false); 
 
 //End of code
 
