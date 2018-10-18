@@ -1,6 +1,6 @@
 //Macro to generate Kymos from MT snaps and GFP streams.
 //Chris Gell 21-05-2018
-//Version 2
+//Version 2.1
 
 //macro to make kymos for gfp tirf data
 //assumes 2 images are loaded and that 
@@ -20,13 +20,15 @@
 //DONE - name directory in an intelegent way - not wanted, not flexible.
 //DONE, not wanted - cope with multiple streams (of the same MT FOV)?
 
+//2018-10-18 updated a stream and MTs were still sometimes misidentified
+//2018-10-18 updated to allow some chromatic shift correction, this is base dont he Fiji 'Align image by lin ROI' tools.
 
 
 
 //environment variables
 envMakeFullOverlay=0;
 envAskForPNGs=0;
-
+ print("\\Clear");
 
 
 
@@ -57,19 +59,105 @@ expName=getString("Enter an indetifier for this experiment", "");
     for (i=1; i<=n; i++) { 
         selectImage(i); 
         list[i-1] = getTitle; 
+print(list[i-1]);
     } 
+print("end");
+   
 
 selectWindow(list[0]);
 getDimensions(width, height, channels, slices, frames);
-if (slices==1) {
-	gfpImageName=list[0];
-	mtImageName=list[1];
-}
 
-if (slices>=1) {
+print("list0 is"+list[0]+"      list1 is "+list[1]);
+print("list0 has "+slices+" slices      "+frames+"  frames");
+
+if ((slices) & (frames)==1) {
 	gfpImageName=list[1];
 	mtImageName=list[0];
+	print("done the and");
 }
+
+
+
+selectWindow(list[0]);
+getDimensions(width, height, channels, slices, frames);
+if ((slices) | (frames)>1) {
+	gfpImageName=list[0];
+	mtImageName=list[1];
+		print("done the or");
+}
+
+print("gfp image is "+gfpImageName);
+print("mt image is "+mtImageName);
+
+
+//Need to determine if this is an Elyra experiment (or at least one where chromatic registration is needed).
+if (getBoolean("Do you need to perform chromatic registration \n (for example ELyra data).") == 1) {
+
+//Code to align data from the Elyra using the fixed, rigid, no scaling, no rotation transform using a line Roi.
+//Chris Gell November 17 2018
+
+
+selectWindow(gfpImageName); //Choose the stream and make a STD projection
+
+
+
+
+run("Z Project...", "projection=[Standard Deviation]");
+run("Enhance Contrast", "saturated=0.35");
+run("16-bit");
+
+/*	the user needs to draw an ROI on this projection and the MT image and the stream image (draw it on one, restore to the others)
+	best to choose a diagonal tube (aligned at 45 degrees) along a MT (idnetified via) . Movement is best done with the cursor keys,
+	you are then shown a overlay of the the gfp projection and mts to check. Note that the only way to re-run is to choose to stop the macro.
+	
+
+	The source image should always be the MT image.
+	
+
+*/
+
+setTool("line");
+waitForUser("Please draw a line ROI on a MT in the using the GFP rpojection \n and restore this to the GFP and MT channel \n using the cursor keys to align it.");
+
+
+run("Align Image by line ROI", "source=["+mtImageName+"] target=[STD_"+gfpImageName+"]");
+selectWindow(mtImageName+" aligned to STD_"+gfpImageName);
+run("16-bit");
+run("Merge Channels...", "c2=[STD_"+gfpImageName+"] c6=["+mtImageName+" aligned to STD_"+gfpImageName+"] create keep");
+
+
+waitForUser("Please check you are happy \n with the registration, \n you will be asked to accept it.");
+
+if (getBoolean("Confirm the registration and proceed?") != 1) {
+
+exit();
+
+	
+}
+
+//close the merge window, close the mt window and rename the other one
+selectWindow("Composite");
+close();
+selectWindow("STD_"+gfpImageName);
+close();
+selectWindow(mtImageName);
+close();
+selectWindow(mtImageName+" aligned to STD_"+gfpImageName);
+rename(mtImageName);
+run("Select None");
+selectWindow(gfpImageName);
+run("Select None");
+
+
+
+
+
+}
+
+
+
+
+
 
 
 
